@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD166" />
+      <stop offset="50%" stop-color="#FF758F" />
+      <stop offset="100%" stop-color="#7054FF" />
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF275" />
+      <stop offset="100%" stop-color="#FFB703" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="125%" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#4A0E4E" flood-opacity="0.28" />
+    </filter>
+  </defs>
+
+  <!-- Base App Icon Rounded Squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+
+  <!-- Inner Soft Glow Border -->
+  <rect x="12" y="12" width="488" height="488" rx="118" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-opacity="0.35" />
+
+  <!-- Central Star Character Group with Shadow -->
+  <g filter="url(#shadow)">
+    <!-- Cute Teddy / Character Face Container -->
+    <!-- Ears -->
+    <circle cx="160" cy="180" r="54" fill="#FFB703" stroke="#FFFFFF" stroke-width="10" />
+    <circle cx="160" cy="180" r="30" fill="#FF758F" />
+    
+    <circle cx="352" cy="180" r="54" fill="#FFB703" stroke="#FFFFFF" stroke-width="10" />
+    <circle cx="352" cy="180" r="30" fill="#FF758F" />
+
+    <!-- Head -->
+    <circle cx="256" cy="270" r="140" fill="url(#starGrad)" stroke="#FFFFFF" stroke-width="12" />
+
+    <!-- Rosy Cheeks -->
+    <ellipse cx="180" cy="295" rx="24" ry="15" fill="#FF5D8F" opacity="0.8" />
+    <ellipse cx="332" cy="295" rx="24" ry="15" fill="#FF5D8F" opacity="0.8" />
+
+    <!-- Eyes with Sparkles -->
+    <circle cx="205" cy="250" r="18" fill="#2B193D" />
+    <circle cx="211" cy="244" r="6" fill="#FFFFFF" />
+    <circle cx="201" cy="254" r="3" fill="#FFFFFF" />
+
+    <circle cx="307" cy="250" r="18" fill="#2B193D" />
+    <circle cx="313" cy="244" r="6" fill="#FFFFFF" />
+    <circle cx="303" cy="254" r="3" fill="#FFFFFF" />
+
+    <!-- Cute Smiling Mouth & Nose -->
+    <path d="M256 265 L250 274 L262 274 Z" fill="#FF5D8F" rx="2" />
+    <path d="M236 286 Q256 312 276 286" fill="none" stroke="#2B193D" stroke-width="8" stroke-linecap="round" />
+
+    <!-- Tiny Crown on Head -->
+    <path d="M226 145 L240 162 L256 135 L272 162 L286 145 L280 175 L232 175 Z" fill="#FFE066" stroke="#FFFFFF" stroke-width="6" stroke-linejoin="round" />
+  </g>
+
+  <!-- Sparkles -->
+  <path d="M100 120 Q120 120 120 100 Q120 120 140 120 Q120 120 120 140 Q120 120 100 120 Z" fill="#FFFFFF" opacity="0.9" />
+  <path d="M380 90 Q395 90 395 75 Q395 90 410 90 Q395 90 395 105 Q395 90 380 90 Z" fill="#FFFFFF" opacity="0.85" />
+  <circle cx="395" cy="390" r="8" fill="#FFFFFF" opacity="0.75" />
+  <circle cx="115" cy="370" r="10" fill="#FFFFFF" opacity="0.75" />
+</svg>

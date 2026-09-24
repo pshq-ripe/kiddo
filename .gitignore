@@ -1,0 +1,16 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Android build outputs
+android/local.properties
+*.apk
+*.aab
+
+# Local archives
+*.zip

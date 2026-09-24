@@ -1,0 +1,6 @@
+{
+  "name": "Kiddo World",
+  "description": "Interaktywny bajkowy świat zabawy w stylu cyfrowego domku dla lalek z kreatorem postaci, mapą przygód i pokojami pełnymi zabawek.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
