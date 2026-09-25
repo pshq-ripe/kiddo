@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import path from 'path';
 import { requireAuth, AuthRequest } from './src/middleware/auth.ts';
 import { getOrCreateUser } from './src/db/users.ts';
@@ -123,11 +124,16 @@ app.post('/api/game-state', requireAuth, async (req: AuthRequest, res) => {
 // Setup Vite middleware in dev or static files in production
 async function startServer() {
   const isDev = process.env.NODE_ENV !== 'production';
+  const httpServer = http.createServer(app);
 
   if (isDev) {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: {
+        middlewareMode: true,
+        hmr: false,
+        watch: null,
+      },
       appType: 'spa',
     });
     app.use(vite.middlewares);
@@ -139,7 +145,7 @@ async function startServer() {
     });
   }
 
-  app.listen(port, '0.0.0.0', () => {
+  httpServer.listen(port, '0.0.0.0', () => {
     console.log(`Kiddo World server running on http://0.0.0.0:${port}`);
   });
 }
