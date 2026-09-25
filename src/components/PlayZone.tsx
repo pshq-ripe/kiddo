@@ -904,6 +904,9 @@ export const PlayZone: React.FC<PlayZoneProps> = ({
 
   const handleStagePointerMove = (e: React.PointerEvent) => {
     if (!stageRef.current) return;
+    if (!draggingFurnitureId && !draggingPetId && !draggingEntityId) {
+      return;
+    }
     const rect = stageRef.current.getBoundingClientRect();
     const x = Math.max(8, Math.min(92, Math.round(((e.clientX - rect.left) / rect.width) * 100)));
     const y = Math.max(20, Math.min(85, Math.round(((e.clientY - rect.top) / rect.height) * 100)));
@@ -1108,7 +1111,7 @@ export const PlayZone: React.FC<PlayZoneProps> = ({
           onPointerMove={handleStagePointerMove}
           onPointerUp={handleStagePointerUp}
           onClick={() => setSelectedFurnitureId(null)}
-          className="relative w-full h-[470px] overflow-hidden flex flex-col justify-between"
+          className="relative w-full h-[470px] overflow-hidden flex flex-col justify-between touch-pan-y"
         >
           {/* Active Location Badge */}
           <div className="absolute top-2.5 left-3.5 z-30 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm border border-outline-variant/30 flex items-center gap-1.5 pointer-events-none">

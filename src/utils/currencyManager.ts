@@ -58,6 +58,23 @@ export const spendCoins = (amount: number, reason?: string): boolean => {
   return true;
 };
 
+export const setCoins = (amount: number): number => {
+  const next = Math.max(0, amount);
+  try {
+    localStorage.setItem(STORAGE_KEY, String(next));
+  } catch {
+    // ignore
+  }
+
+  window.dispatchEvent(
+    new CustomEvent('kiddo_coins_updated', {
+      detail: { coins: next, diff: 0, reason: 'Cloud Sync' }
+    })
+  );
+
+  return next;
+};
+
 export const canAfford = (amount: number): boolean => {
   return getCoins() >= amount;
 };

@@ -121,148 +121,26 @@ export const INVITATION_ROOMS: InvitationRoomDef[] = [
   }
 ];
 
-const FRIENDSHIP_STORAGE_KEY = 'kiddo_friends_data_v1';
-const MAILBOX_STORAGE_KEY = 'kiddo_mailbox_data_v1';
+const FRIENDSHIP_STORAGE_KEY = 'kiddo_friends_data_v2';
+const MAILBOX_STORAGE_KEY = 'kiddo_mailbox_data_v2';
 
-export const INITIAL_FRIENDS: FriendProfile[] = [
-  {
-    id: 'zosia',
-    name: 'Zosia',
-    avatarEmoji: '🐱',
-    favoriteActivity: 'Zabawa z kotkami i malowanie tęczy',
-    friendshipLevel: 3,
-    friendshipPoints: 60,
-    favoriteGift: 'Ciasteczko rybka 🐟',
-    bio: 'Wesoła dziewczynka w opasce z uszkami kotka. Zawsze chętna na przytulaski!',
-    lastInteractionText: 'Czeka na Ciebie w domku! 💕'
-  },
-  {
-    id: 'leos',
-    name: 'Leoś',
-    avatarEmoji: '🦁',
-    favoriteActivity: 'Układanie klocków i zjeżdżalnia dinozaura',
-    friendshipLevel: 2,
-    friendshipPoints: 40,
-    favoriteGift: 'Dinozaur z klocków 🦖',
-    bio: 'Mały odkrywca w żółtej bluzie. Uwielbia przybijać piątki i biegać po parku.',
-    lastInteractionText: 'Zbudował dla Ciebie zamek z piasku! 🏰'
-  },
-  {
-    id: 'maja',
-    name: 'Maja',
-    avatarEmoji: '🎨',
-    favoriteActivity: 'Miksowanie babeczek i malowanie pejzaży',
-    friendshipLevel: 2,
-    friendshipPoints: 35,
-    favoriteGift: 'Pędzel do akwareli 🖌️',
-    bio: 'Artystka z fioletowym berecikiem. Tworzy najpiękniejsze rysunki w szkole sztuki.',
-    lastInteractionText: 'Namalowała dla Ciebie serduszko! 💖'
-  },
-  {
-    id: 'franek',
-    name: 'Franek',
-    avatarEmoji: '🚀',
-    favoriteActivity: 'Badanie gwiazd i podglądanie delfinów',
-    friendshipLevel: 1,
-    friendshipPoints: 20,
-    favoriteGift: 'Błyszcząca gwiazdka ⭐',
-    bio: 'Marzyciel w kosmicznym kombinezonie. Uwielbia dzielić się ciekawostkami o kosmosie.',
-    lastInteractionText: 'Pomachał Ci przez lunetę! 🔭'
-  },
-  {
-    id: 'pola',
-    name: 'Pola Weterynarz',
-    avatarEmoji: '🩺',
-    favoriteActivity: 'Opieka nad puszystymi pieskami i kotkami',
-    friendshipLevel: 2,
-    friendshipPoints: 50,
-    favoriteGift: 'Chrupiące smaczki 🦴',
-    bio: 'Troskliwa opiekunka zwierząt. Zawsze ma w kieszeni witaminki i plasterki z serduszkiem.',
-    lastInteractionText: 'Pieski przesyłają Ci radosne hau-hau! 🐶'
-  }
-];
+export const INITIAL_FRIENDS: FriendProfile[] = [];
 
-export const INITIAL_MAILS: FriendMail[] = [
-  {
-    id: 'mail-invite-zosia',
-    fromFriendId: 'zosia',
-    fromFriendName: 'Zosia',
-    fromFriendEmoji: '🐱',
-    subject: '💌 Zaproszenie na herbatkę do Mieszkania!',
-    message: 'Cześć! Upiekłam pyszne ciasteczka w kuchni i przygotowałam poduszki w salonie. Wpadnij do mnie na wspólną herbatkę i wesołe zabawy!',
-    invitation: {
-      id: 'inv-zosia-apt',
-      targetRoomId: 'apartment',
-      roomName: 'Mieszkanie Przyjaciół',
-      roomEmoji: '🏠',
-      activityName: 'Wspólna herbatka i seans bajek w salonie 🧸',
-      inviterId: 'zosia',
-      inviterName: 'Zosia',
-      inviterEmoji: '🐱',
-      recipientId: 'player',
-      recipientName: 'Ty',
-      recipientEmoji: '⭐',
-      status: 'pending',
-      sentAt: 'Dzisiaj'
-    },
-    gift: {
-      type: 'coins',
-      amount: 25,
-      emoji: '🪙',
-      label: '25 monet na poczęstunek'
-    },
-    dateStr: 'Dzisiaj',
-    isRead: false,
-    isGiftClaimed: false
-  },
-  {
-    id: 'mail-welcome',
-    fromFriendId: 'zosia',
-    fromFriendName: 'Zosia',
-    fromFriendEmoji: '🐱',
-    subject: 'Witaj w Miasteczku Przyjaciół! 💌',
-    message: 'Cześć! Tak bardzo się cieszę, że jesteśmy znajomymi! Przyjdź do mojego domku, zrobimy sobie herbatkę z ciasteczkami!',
-    gift: {
-      type: 'coins',
-      amount: 40,
-      emoji: '🪙',
-      label: '40 monet powitalnych'
-    },
-    dateStr: 'Wczoraj',
-    isRead: false,
-    isGiftClaimed: false
-  },
-  {
-    id: 'mail-leos-dino',
-    fromFriendId: 'leos',
-    fromFriendName: 'Leoś',
-    fromFriendEmoji: '🦁',
-    subject: 'Przybij piątkę na placu zabaw! ✋',
-    message: 'Hejka! Dzisiaj na placu zabaw wypróbowałem karuzelę, kręci się super szybko! Mam dla Ciebie naklejkę rakiety!',
-    gift: {
-      type: 'sticker',
-      emoji: '🚀',
-      label: 'Naklejka Rakiety Kosmicznej'
-    },
-    dateStr: 'Wczoraj',
-    isRead: false,
-    isGiftClaimed: false
-  }
-];
+export const INITIAL_MAILS: FriendMail[] = [];
 
 export const getFriendsList = (): FriendProfile[] => {
   try {
     const raw = localStorage.getItem(FRIENDSHIP_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      if (Array.isArray(parsed)) {
         return parsed;
       }
     }
   } catch {
     // ignore
   }
-  return INITIAL_FRIENDS;
+  return [];
 };
 
 export const saveFriendsList = (friends: FriendProfile[]): void => {
@@ -272,6 +150,35 @@ export const saveFriendsList = (friends: FriendProfile[]): void => {
   } catch {
     // ignore
   }
+};
+
+export const addFriendProfile = (newFriend: {
+  name: string;
+  avatarEmoji?: string;
+  favoriteActivity?: string;
+  bio?: string;
+}): FriendProfile => {
+  const current = getFriendsList();
+  const friend: FriendProfile = {
+    id: `friend-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    name: newFriend.name.trim() || 'Nowy Przyjaciel',
+    avatarEmoji: newFriend.avatarEmoji || '⭐',
+    favoriteActivity: newFriend.favoriteActivity || 'Wspólna wesoła zabawa 🎈',
+    friendshipLevel: 1,
+    friendshipPoints: 10,
+    favoriteGift: 'Ciasteczko 🍪',
+    bio: newFriend.bio || 'Wesoły przyjaciel ze świata Kiddo.',
+    lastInteractionText: 'Właśnie dołączył do listy przyjaciół! ✨'
+  };
+  const updated = [friend, ...current];
+  saveFriendsList(updated);
+  return friend;
+};
+
+export const removeFriendProfile = (id: string): void => {
+  const current = getFriendsList();
+  const updated = current.filter(f => f.id !== id);
+  saveFriendsList(updated);
 };
 
 export const getMailbox = (): FriendMail[] => {
@@ -286,7 +193,7 @@ export const getMailbox = (): FriendMail[] => {
   } catch {
     // ignore
   }
-  return INITIAL_MAILS;
+  return [];
 };
 
 export const saveMailbox = (mails: FriendMail[]): void => {
@@ -530,8 +437,8 @@ export const sendRoomInvitation = (
     })
   );
 
-  // If the recipient is an NPC friend, simulate their excited reply!
-  const isRecipientFriend = INITIAL_FRIENDS.some(f => f.id === recipient.id);
+  // If the recipient is in the friends list, simulate their excited reply!
+  const isRecipientFriend = getFriendsList().some(f => f.id === recipient.id);
   if (isRecipientFriend) {
     setTimeout(() => {
       const replyQuotes = [
@@ -659,8 +566,9 @@ export const declineInvitation = (mailId: string): void => {
 };
 
 // Simulate a surprise incoming digital invitation from an NPC friend
-export const simulateIncomingFriendInvitation = (specifiedFriendId?: string): FriendMail => {
+export const simulateIncomingFriendInvitation = (specifiedFriendId?: string): FriendMail | null => {
   const friends = getFriendsList();
+  if (friends.length === 0) return null;
   const friend = specifiedFriendId
     ? friends.find(f => f.id === specifiedFriendId) || friends[0]
     : friends[Math.floor(Math.random() * friends.length)];

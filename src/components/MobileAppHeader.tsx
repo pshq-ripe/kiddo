@@ -10,6 +10,7 @@ import { CharacterHead } from './CharacterHead';
 import { DailyAdventureCalendarModal } from './DailyAdventureCalendarModal';
 import { FriendshipManagerModal } from './FriendshipManagerModal';
 import { getUnreadMailsCount } from '../utils/friendshipManager';
+import { UserAuthSyncButton } from './UserAuthSyncButton';
 
 interface MobileAppHeaderProps {
   activeTab: TabType;
@@ -125,6 +126,9 @@ export const MobileAppHeader: React.FC<MobileAppHeaderProps> = ({
 
         {/* Right Action Icons: Weather, Sound & Active Character Avatar */}
         <div className="flex items-center gap-1.5 shrink-0">
+          {/* Cloud Auth & Multi-Device Sync Button */}
+          <UserAuthSyncButton compact={true} />
+
           {/* Quick PWA Mobile Install Action Button */}
           <PWAInstallButton variant="header" />
 

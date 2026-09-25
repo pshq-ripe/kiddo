@@ -7,6 +7,8 @@ import {
   InvitationRoomDef,
   getFriendsList,
   getMailbox,
+  addFriendProfile,
+  removeFriendProfile,
   sendGiftToFriend,
   sendRoomInvitation,
   acceptInvitation,
@@ -18,6 +20,7 @@ import {
 } from '../utils/friendshipManager';
 import { sound } from '../utils/sound';
 import { getCoins, spendCoins } from '../utils/currencyManager';
+import { UserAuthSyncButton } from './UserAuthSyncButton';
 
 interface FriendshipManagerModalProps {
   isOpen: boolean;
@@ -50,7 +53,7 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
     name: 'Twoja Postać',
     emoji: '⭐'
   });
-  const [inviteRecipientId, setInviteRecipientId] = useState<string>('zosia');
+  const [inviteRecipientId, setInviteRecipientId] = useState<string>(() => friends[0]?.id || '');
   const [selectedRoomId, setSelectedRoomId] = useState<string>('apartment');
   const [selectedActivity, setSelectedActivity] = useState<string>(
     INVITATION_ROOMS[0].activities[0]
@@ -61,7 +64,7 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
   const [inviteSuccess, setInviteSuccess] = useState<boolean>(false);
 
   // Send Gift Form state
-  const [targetFriendId, setTargetFriendId] = useState<string>('');
+  const [targetFriendId, setTargetFriendId] = useState<string>(() => friends[0]?.id || '');
   const [selectedGiftType, setSelectedGiftType] = useState<{
     id: 'snack' | 'sticker' | 'postcard' | 'coins';
     emoji: string;
@@ -75,6 +78,27 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
   });
   const [greetingText, setGreetingText] = useState<string>('Jesteś moim najlepszym przyjacielem! 💖');
   const [sendSuccess, setSendSuccess] = useState<boolean>(false);
+
+  // Add Friend Modal State
+  const [showAddFriendModal, setShowAddFriendModal] = useState<boolean>(false);
+  const [newFriendName, setNewFriendName] = useState<string>('');
+  const [newFriendEmoji, setNewFriendEmoji] = useState<string>('🐱');
+  const [newFriendActivity, setNewFriendActivity] = useState<string>('Wspólna wesoła zabawa 🎈');
+
+  const handleAddFriendSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFriendName.trim()) return;
+    sound.playFanfare();
+    const created = addFriendProfile({
+      name: newFriendName.trim(),
+      avatarEmoji: newFriendEmoji,
+      favoriteActivity: newFriendActivity.trim() || 'Wspólna wesoła zabawa 🎈'
+    });
+    setNewFriendName('');
+    setShowAddFriendModal(false);
+    setInviteRecipientId(created.id);
+    setTargetFriendId(created.id);
+  };
 
   // Sync data updates
   useEffect(() => {
@@ -351,10 +375,10 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
                   <span className="text-[28px] animate-bounce">🎈</span>
                   <div>
                     <h3 className="font-black text-[14px] text-amber-950">
-                      Zorganizuj Imprezę lub Zabawę!
+                      Przyjaciele i Zabawa
                     </h3>
                     <p className="text-[11px] text-amber-900/80 font-bold">
-                      Zaproś znajomych do wybranego pokoju na spotkanie!
+                      Zarządzaj swoją paczką i wysyłaj zaproszenia!
                     </p>
                   </div>
                 </div>
@@ -364,112 +388,157 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
                     type="button"
                     onClick={() => {
                       sound.playSparkle();
-                      simulateIncomingFriendInvitation();
+                      setShowAddFriendModal(true);
                     }}
-                    title="Poproś o niespodziankowe zaproszenie od przyjaciela"
-                    className="px-2.5 py-1.5 rounded-2xl bg-white hover:bg-pink-50 text-pink-700 font-extrabold text-[11px] border border-pink-300 shadow-2xs active:scale-95 transition-transform"
+                    title="Dodaj nowego przyjaciela do listy"
+                    className="px-3 py-1.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 text-white font-black text-[12px] shadow-sm flex items-center gap-1 active:scale-95 transition-transform"
                   >
-                    <span>Niespodzianka ✨</span>
+                    <span>+ Dodaj</span>
+                    <span>🐱</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      sound.playFanfare();
-                      onStartParty?.();
-                      onClose();
-                    }}
-                    className="px-3 py-2 rounded-2xl bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-[12px] shadow-sm flex items-center gap-1 active:scale-95 transition-transform"
-                  >
-                    <span>Impreza 🎉</span>
-                  </button>
+                  {friends.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sound.playFanfare();
+                        onStartParty?.();
+                        onClose();
+                      }}
+                      className="px-3 py-1.5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-amber-950 font-black text-[12px] shadow-sm flex items-center gap-1 active:scale-95 transition-transform"
+                    >
+                      <span>Impreza 🎉</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
-              {/* Friends Cards */}
-              <div className="flex flex-col gap-2.5">
-                {friends.map((friend) => (
-                  <div
-                    key={friend.id}
-                    className="bg-surface-container-low hover:bg-surface-container rounded-3xl p-3 border border-outline-variant/30 flex items-center justify-between gap-3 shadow-2xs transition-all"
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      {/* Avatar */}
-                      <div className="w-13 h-13 rounded-2xl bg-surface-container-lowest border-2 border-pink-300 flex items-center justify-center text-[28px] shrink-0 shadow-xs">
-                        {friend.avatarEmoji}
-                      </div>
+              {/* Friends Cards or Empty State */}
+              {friends.length === 0 ? (
+                <div className="bg-surface-container-low rounded-3xl p-6 text-center flex flex-col items-center gap-3 border border-outline-variant/30 my-2">
+                  <div className="w-16 h-16 rounded-3xl bg-pink-100 border-2 border-pink-300 flex items-center justify-center text-[34px] shadow-xs">
+                    💌
+                  </div>
+                  <div>
+                    <h4 className="font-black text-[16px] text-on-surface">Lista przyjaciół jest pusta</h4>
+                    <p className="text-[12px] text-on-surface-variant font-medium max-w-xs mt-1">
+                      Nie masz jeszcze dodanych znajomych. Dodaj przyjaciela, aby wspólnie bawić się w pokojach, wysyłać listy i wymieniać prezenty!
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1 flex-wrap justify-center">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        sound.playSparkle();
+                        setShowAddFriendModal(true);
+                      }}
+                      className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 text-white font-black text-[13px] shadow-md flex items-center gap-2 active:scale-95 transition-transform"
+                    >
+                      <span>Dodaj pierwszego przyjaciela</span>
+                      <span>➕</span>
+                    </button>
 
-                      <div className="flex flex-col min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h4 className="font-black text-[15px] text-on-surface truncate">
-                            {friend.name}
-                          </h4>
-                          {/* Friendship Hearts */}
-                          <div className="flex items-center text-[12px] text-pink-500">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <span key={i} className={i < friend.friendshipLevel ? 'opacity-100' : 'opacity-25'}>
-                                ❤️
-                              </span>
-                            ))}
-                          </div>
+                    <UserAuthSyncButton />
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5">
+                  {friends.map((friend) => (
+                    <div
+                      key={friend.id}
+                      className="bg-surface-container-low hover:bg-surface-container rounded-3xl p-3 border border-outline-variant/30 flex items-center justify-between gap-3 shadow-2xs transition-all"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Avatar */}
+                        <div className="w-13 h-13 rounded-2xl bg-surface-container-lowest border-2 border-pink-300 flex items-center justify-center text-[28px] shrink-0 shadow-xs">
+                          {friend.avatarEmoji}
                         </div>
 
-                        <p className="text-[11px] text-on-surface-variant font-semibold truncate mt-0.5">
-                          {friend.favoriteActivity}
-                        </p>
+                        <div className="flex flex-col min-w-0">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-black text-[15px] text-on-surface truncate">
+                              {friend.name}
+                            </h4>
+                            {/* Friendship Hearts */}
+                            <div className="flex items-center text-[12px] text-pink-500">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <span key={i} className={i < friend.friendshipLevel ? 'opacity-100' : 'opacity-25'}>
+                                  ❤️
+                                </span>
+                              ))}
+                            </div>
+                          </div>
 
-                        {friend.lastInteractionText && (
-                          <span className="text-[10px] font-bold text-pink-600 bg-pink-100/70 rounded-full px-2 py-0.5 w-fit mt-1">
-                            {friend.lastInteractionText}
-                          </span>
-                        )}
+                          <p className="text-[11px] text-on-surface-variant font-semibold truncate mt-0.5">
+                            {friend.favoriteActivity}
+                          </p>
+
+                          {friend.lastInteractionText && (
+                            <span className="text-[10px] font-bold text-pink-600 bg-pink-100/70 rounded-full px-2 py-0.5 w-fit mt-1">
+                              {friend.lastInteractionText}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {/* Send Invitation shortcut button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sound.playPop(580);
+                            setInviteRecipientId(friend.id);
+                            setActiveTab('invite');
+                          }}
+                          title="Wyślij zaproszenie do wybranego pokoju"
+                          className="px-2.5 py-1.5 rounded-2xl bg-pink-100 hover:bg-pink-200 text-pink-800 font-extrabold text-[11px] flex items-center gap-1 shadow-2xs active:scale-90 transition-transform"
+                        >
+                          <span>Zaproś</span>
+                          <span>💌</span>
+                        </button>
+
+                        {/* Hug button */}
+                        <button
+                          type="button"
+                          onClick={() => handleQuickHug(friend)}
+                          title="Przytul znajomego (+15 pkt przyjaźni)"
+                          className="w-8 h-8 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 flex items-center justify-center text-[15px] shadow-2xs active:scale-90 transition-transform"
+                        >
+                          🤗
+                        </button>
+
+                        {/* Send Gift shortcut */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sound.playPop();
+                            setTargetFriendId(friend.id);
+                            setActiveTab('send');
+                          }}
+                          title="Wyślij prezent"
+                          className="w-8 h-8 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-800 flex items-center justify-center text-[15px] shadow-2xs active:scale-90 transition-transform"
+                        >
+                          🎁
+                        </button>
+
+                        {/* Remove Friend button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            sound.playPop(380);
+                            removeFriendProfile(friend.id);
+                          }}
+                          title="Usuń znajomego"
+                          className="w-7 h-7 rounded-xl bg-surface-container hover:bg-rose-100 text-on-surface-variant hover:text-rose-700 flex items-center justify-center text-[12px] active:scale-90 transition-transform"
+                        >
+                          ✕
+                        </button>
                       </div>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      {/* Send Invitation shortcut button */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          sound.playPop(580);
-                          setInviteRecipientId(friend.id);
-                          setActiveTab('invite');
-                        }}
-                        title="Wyślij zaproszenie do wybranego pokoju"
-                        className="px-2.5 py-1.5 rounded-2xl bg-pink-100 hover:bg-pink-200 text-pink-800 font-extrabold text-[11px] flex items-center gap-1 shadow-2xs active:scale-90 transition-transform"
-                      >
-                        <span>Zaproś</span>
-                        <span>💌</span>
-                      </button>
-
-                      {/* Hug button */}
-                      <button
-                        type="button"
-                        onClick={() => handleQuickHug(friend)}
-                        title="Przytul znajomego (+15 pkt przyjaźni)"
-                        className="w-8 h-8 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 flex items-center justify-center text-[15px] shadow-2xs active:scale-90 transition-transform"
-                      >
-                        🤗
-                      </button>
-
-                      {/* Send Gift shortcut */}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          sound.playPop();
-                          setTargetFriendId(friend.id);
-                          setActiveTab('send');
-                        }}
-                        title="Wyślij prezent"
-                        className="w-8 h-8 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-800 flex items-center justify-center text-[15px] shadow-2xs active:scale-90 transition-transform"
-                      >
-                        🎁
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -815,28 +884,43 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
                 <label className="text-[12px] font-black text-on-surface">
                   2. Do kogo wysyłasz zaproszenie:
                 </label>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {friends.map(f => (
+                {friends.length === 0 ? (
+                  <div className="p-4 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant/40 text-center flex flex-col items-center gap-2">
+                    <p className="text-[12px] text-on-surface-variant font-bold">
+                      Brak przyjaciół na liście. Dodaj przyjaciela, aby wysłać zaproszenie!
+                    </p>
                     <button
-                      key={f.id}
                       type="button"
-                      onClick={() => {
-                        sound.playPop(560);
-                        setInviteRecipientId(f.id);
-                      }}
-                      className={`p-2 rounded-2xl flex flex-col items-center gap-1 border-2 transition-transform active:scale-95 ${
-                        inviteRecipientId === f.id
-                          ? 'bg-pink-100 border-pink-400 ring-2 ring-pink-400/40 scale-105 shadow-xs'
-                          : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container'
-                      }`}
+                      onClick={() => setShowAddFriendModal(true)}
+                      className="px-3 py-1.5 rounded-xl bg-pink-500 text-white font-extrabold text-[11px] flex items-center gap-1 active:scale-95 transition-transform"
                     >
-                      <span className="text-[24px]">{f.avatarEmoji}</span>
-                      <span className="text-[10px] font-bold text-on-surface truncate w-full text-center">
-                        {f.name}
-                      </span>
+                      <span>+ Dodaj Przyjaciela</span>
                     </button>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-5 gap-1.5">
+                    {friends.map(f => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => {
+                          sound.playPop(560);
+                          setInviteRecipientId(f.id);
+                        }}
+                        className={`p-2 rounded-2xl flex flex-col items-center gap-1 border-2 transition-transform active:scale-95 ${
+                          inviteRecipientId === f.id
+                            ? 'bg-pink-100 border-pink-400 ring-2 ring-pink-400/40 scale-105 shadow-xs'
+                            : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container'
+                        }`}
+                      >
+                        <span className="text-[24px]">{f.avatarEmoji}</span>
+                        <span className="text-[10px] font-bold text-on-surface truncate w-full text-center">
+                          {f.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Step 3: Choose Meeting Room */}
@@ -943,28 +1027,43 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
                 <label className="text-[12px] font-black text-on-surface">
                   1. Wybierz Znajomego:
                 </label>
-                <div className="grid grid-cols-5 gap-2">
-                  {friends.map(f => (
+                {friends.length === 0 ? (
+                  <div className="p-4 bg-surface-container-low rounded-2xl border border-dashed border-outline-variant/40 text-center flex flex-col items-center gap-2">
+                    <p className="text-[12px] text-on-surface-variant font-bold">
+                      Brak przyjaciół na liście. Dodaj przyjaciela, aby wysłać podarunek!
+                    </p>
                     <button
-                      key={f.id}
                       type="button"
-                      onClick={() => {
-                        sound.playPop(520);
-                        setTargetFriendId(f.id);
-                      }}
-                      className={`p-2 rounded-2xl flex flex-col items-center gap-1 border-2 transition-transform active:scale-95 ${
-                        targetFriendId === f.id
-                          ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-400/40 scale-105 shadow-xs'
-                          : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container'
-                      }`}
+                      onClick={() => setShowAddFriendModal(true)}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500 text-white font-extrabold text-[11px] flex items-center gap-1 active:scale-95 transition-transform"
                     >
-                      <span className="text-[24px]">{f.avatarEmoji}</span>
-                      <span className="text-[11px] font-bold text-on-surface truncate w-full text-center">
-                        {f.name}
-                      </span>
+                      <span>+ Dodaj Przyjaciela</span>
                     </button>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-5 gap-2">
+                    {friends.map(f => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => {
+                          sound.playPop(520);
+                          setTargetFriendId(f.id);
+                        }}
+                        className={`p-2 rounded-2xl flex flex-col items-center gap-1 border-2 transition-transform active:scale-95 ${
+                          targetFriendId === f.id
+                            ? 'bg-amber-100 border-amber-400 ring-2 ring-amber-400/40 scale-105 shadow-xs'
+                            : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container'
+                        }`}
+                      >
+                        <span className="text-[24px]">{f.avatarEmoji}</span>
+                        <span className="text-[11px] font-bold text-on-surface truncate w-full text-center">
+                          {f.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Step 2: Choose Gift */}
@@ -1059,6 +1158,93 @@ export const FriendshipManagerModal: React.FC<FriendshipManagerModalProps> = ({
             <span>{getCoins()} 🪙</span>
           </span>
         </div>
+
+        {/* Add Friend Submodal */}
+        {showAddFriendModal && (
+          <div className="absolute inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+            <div className="w-full max-w-sm bg-surface rounded-3xl p-5 shadow-2xl border-4 border-pink-300 flex flex-col gap-3.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-[24px]">🐱</span>
+                  <h3 className="font-black text-[16px] text-on-surface">Dodaj Przyjaciela</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowAddFriendModal(false)}
+                  className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant font-black active:scale-95"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <form onSubmit={handleAddFriendSubmit} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-black text-on-surface">Imię przyjaciela:</label>
+                  <input
+                    type="text"
+                    required
+                    value={newFriendName}
+                    onChange={(e) => setNewFriendName(e.target.value)}
+                    placeholder="np. Antoś, Kasia, Tymek..."
+                    maxLength={20}
+                    className="w-full rounded-2xl p-2.5 bg-surface-container-low border border-outline-variant/40 text-[14px] font-bold text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-black text-on-surface">Wybierz ikonkę:</label>
+                  <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                    {['🐱', '🦁', '🐶', '🐰', '🐼', '🦊', '🦄', '⭐', '🚀', '🎨'].map(emoji => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        onClick={() => {
+                          sound.playPop(520);
+                          setNewFriendEmoji(emoji);
+                        }}
+                        className={`w-10 h-10 rounded-2xl flex items-center justify-center text-[22px] shrink-0 border-2 transition-transform active:scale-90 ${
+                          newFriendEmoji === emoji
+                            ? 'bg-pink-100 border-pink-500 scale-110 shadow-xs'
+                            : 'bg-surface-container-low border-outline-variant/30 hover:bg-surface-container'
+                        }`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[12px] font-black text-on-surface">Ulubiona zabawa:</label>
+                  <input
+                    type="text"
+                    value={newFriendActivity}
+                    onChange={(e) => setNewFriendActivity(e.target.value)}
+                    placeholder="np. Skakanie na trampolinie, rysowanie..."
+                    maxLength={40}
+                    className="w-full rounded-2xl p-2.5 bg-surface-container-low border border-outline-variant/40 text-[13px] font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowAddFriendModal(false)}
+                    className="flex-1 py-2.5 rounded-2xl bg-surface-container text-on-surface font-bold text-[13px] active:scale-95"
+                  >
+                    Anuluj
+                  </button>
+                  <button
+                    type="submit"
+                    className="flex-1 py-2.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white font-black text-[13px] shadow-sm active:scale-95 transition-transform"
+                  >
+                    Zapisz Przyjaciela ✨
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

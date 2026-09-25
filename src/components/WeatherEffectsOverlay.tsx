@@ -214,71 +214,6 @@ export const WeatherEffectsOverlay: React.FC<WeatherEffectsOverlayProps> = ({
     }, 850);
   };
 
-  // Global Passive Touch Listener on Phone Screen Container
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    // Attach to parent element (the phone screen viewport)
-    const targetElement = container.parentElement || container;
-
-    const handlePointerDown = (e: PointerEvent) => {
-      // Don't trigger if user explicitly clicked navigation or interactive top buttons
-      const target = e.target as HTMLElement | null;
-      if (target?.closest('button') || target?.closest('a') || target?.closest('[data-no-weather-tap]')) {
-        // Still allow button clicks without creating overlay distortion
-        return;
-      }
-
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      // Ensure tap is within the screen bounds
-      if (x < 0 || x > rect.width || y < 0 || y > rect.height) return;
-
-      lastTouchTime.current = Date.now();
-
-      if (weather === 'rain') {
-        triggerRainSplash(x, y);
-      } else if (weather === 'snow') {
-        triggerSnowBloom(x, y);
-      } else {
-        triggerGenericBurst(x, y);
-      }
-    };
-
-    const handlePointerMove = (e: PointerEvent) => {
-      // Respond to touch drag / finger swipe across screen with throttle
-      if (e.buttons === 0 && e.pointerType === 'mouse') return;
-
-      const now = Date.now();
-      if (now - lastTouchTime.current < 110) return; // Smooth 110ms throttle
-
-      const rect = container.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      if (x < 0 || x > rect.width || y < 0 || y > rect.height) return;
-
-      lastTouchTime.current = now;
-
-      if (weather === 'rain') {
-        triggerRainSplash(x, y, 36);
-      } else if (weather === 'snow') {
-        triggerSnowBloom(x, y, 48);
-      }
-    };
-
-    targetElement.addEventListener('pointerdown', handlePointerDown, { capture: true, passive: true });
-    targetElement.addEventListener('pointermove', handlePointerMove, { capture: true, passive: true });
-
-    return () => {
-      targetElement.removeEventListener('pointerdown', handlePointerDown, { capture: true });
-      targetElement.removeEventListener('pointermove', handlePointerMove, { capture: true });
-    };
-  }, [weather]);
-
   // Pre-configured snowflakes for snow variant
   const snowflakes = [
     { id: 1, left: '6%', size: 'text-[22px]', duration: '5.2s', delay: '0s', char: '❄' },
@@ -516,7 +451,7 @@ export const WeatherEffectsOverlay: React.FC<WeatherEffectsOverlayProps> = ({
                 animationDelay: flake.delay,
                 animationDuration: flake.duration
               }}
-              className={`absolute animate-snowfall pointer-events-auto cursor-pointer p-3 -m-3 select-none ${flake.size}`}
+              className={`absolute animate-snowfall pointer-events-none select-none ${flake.size}`}
               onClick={(e) => {
                 e.stopPropagation();
                 const rect = e.currentTarget.getBoundingClientRect();
@@ -581,7 +516,7 @@ export const WeatherEffectsOverlay: React.FC<WeatherEffectsOverlayProps> = ({
                 animationDelay: drop.delay,
                 animationDuration: drop.duration
               }}
-              className="absolute animate-rainfall pointer-events-auto cursor-pointer p-3.5 -m-3.5 flex items-center justify-center select-none"
+              className="absolute animate-rainfall pointer-events-none flex items-center justify-center select-none"
               onClick={(e) => {
                 e.stopPropagation();
                 const rect = e.currentTarget.getBoundingClientRect();

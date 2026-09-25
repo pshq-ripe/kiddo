@@ -230,7 +230,7 @@ export const PhoneSimulator: React.FC<PhoneSimulatorProps> = ({
             />
 
             {/* Scrollable Mobile App Screen Viewport */}
-            <div className="flex-1 w-full overflow-y-auto overflow-x-hidden no-scrollbar relative flex flex-col overscroll-contain">
+            <div className="flex-1 w-full overflow-y-auto overflow-x-hidden no-scrollbar relative flex flex-col overscroll-contain touch-pan-y">
               {children}
             </div>
 
